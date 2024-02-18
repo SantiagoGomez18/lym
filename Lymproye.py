@@ -27,7 +27,8 @@ def parser(filetxt, instruccioens):
     
     funciones = {}
     funciones = anadir_funcion(tokens, funciones)
-    
+
+    print(variables)
     i = 0  #iterador
     posicion = 0 #indice
     
@@ -39,16 +40,13 @@ def parser(filetxt, instruccioens):
             avance, verificador = comandos(tokens[posicion], tokens, instrucciones, posicion, variables, funciones)
 
             posicion += avance
-        
-    
+            
     if verificador == True:
         respuesta = "Sirve :D"
     elif verificador == False:
         respuesta = "No sirve :c"
     
-    return respuesta
-
-
+    return print(respuesta)
 
 
 def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, variables: dict, funciones: dict):
@@ -56,17 +54,36 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
     avance = 1
 
     if token == "(":
-        if tokens[posicionAct + 1] == "defvar" and tokens[posicionAct + 2] in variables and \
+        if tokens[posicionAct + 1] == "defvar" and tokens[posicionAct + 2] in variables.keys() and \
             tokens[posicionAct + 3] in variables and tokens[posicionAct + 4] == ")":
-            pass
+            print('')
     return avance, verificador
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
     
 def anadir_variable(tokens, variables):
     for i in range(len(tokens)):
         if tokens[i] == "defvar":
             if tokens[i + 1] not in variables:
-                variables[tokens[i + 1]] = 0
+                variables[tokens[i + 1]] = tokens[i + 2]
+                if tokens[i + 2] == '':
+                    variables[tokens[i + 1]] = tokens[i + 3]
+                    if tokens[i + 3] == '':
+                        variables[tokens[i + 1]] = tokens[i + 4]
+                        if tokens[i + 4] == '':
+                            variables[tokens[i + 1]] = tokens[i + 5]
+                            if tokens[i + 5] == '':
+                                variables[tokens[i + 1]] = tokens[i + 6]    
+
     return variables
 
 def anadir_funcion(tokens, funciones):
@@ -77,7 +94,7 @@ def anadir_funcion(tokens, funciones):
     return funciones
     
 prueba = """
-(defvar a  3)
+(defvar a 3)
 (defvar b a)
 (defvar c myXpos)
 (defvar d 0)
