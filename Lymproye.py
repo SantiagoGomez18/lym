@@ -27,13 +27,13 @@ def parser(filetxt, instruccioens):
     
     funciones = {}
     funciones = anadir_funcion(tokens, funciones)
-
-    print(variables)
+    
     i = 0  #iterador
     posicion = 0 #indice
     
      #Elimina el carascter vacio de la lista de tokens para poder realizar un mero estudio
-    tokens = [token for token in tokens if token != ""]
+    while "" in tokens:
+        tokens.remove("")
     
     while posicion < len(tokens) and verificador == True:
         if i == 0:
@@ -53,10 +53,14 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
     verificador = True
     avance = 1
 
+
     if token == "(":
         if tokens[posicionAct + 1] == "defvar" and tokens[posicionAct + 2] in variables.keys() and \
             tokens[posicionAct + 3] in variables and tokens[posicionAct + 4] == ")":
-            print('')
+            nuevoBloque = tokens[posicionAct: posicionAct + 5]
+            avance = nuevoBloque.index(")") + 1
+
+            
     return avance, verificador
   
   
@@ -94,7 +98,8 @@ def anadir_funcion(tokens, funciones):
     return funciones
     
 prueba = """
-(defvar a 3)
+
+(defvar a  3)
 (defvar b a)
 (defvar c myXpos)
 (defvar d 0)
@@ -110,7 +115,7 @@ prueba = """
 	(put :chips 1)
 ))
 
-(defun recursion (x y z)          
+(defun recursion (x y z) 
 	(defvar start myYpos)
 	(move-dir start :back)
 	(run-dirs :front :front :right :right)
