@@ -45,7 +45,7 @@ def parser(filetxt, instruccioens):
         respuesta = "Sirve :D"
     elif verificador == False:
         respuesta = "No sirve :c"
-    
+
     return print(respuesta)
 
 
@@ -59,7 +59,6 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
             tokens[posicionAct + 3] in variables and tokens[posicionAct + 4] == ")":
             nuevoBloque = tokens[posicionAct: posicionAct + 5]
             avance = nuevoBloque.index(")") + 1
-
             
     return avance, verificador
   
@@ -87,6 +86,8 @@ def anadir_variable(tokens, variables):
                             variables[tokens[i + 1]] = tokens[i + 5]
                             if tokens[i + 5] == '':
                                 variables[tokens[i + 1]] = tokens[i + 6]    
+                                if tokens[i + 6] == '':
+                                    variables[tokens[i + 1]] = tokens[i + 7]
 
     return variables
 
