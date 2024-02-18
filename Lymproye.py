@@ -3,7 +3,8 @@ verificador = True
 instrucciones = ["defvar", "=", "move", "skip", "turn", "move-dir", "runs-dir", "move-face", 
         "Dim", "myXpos", "myYpose", "myChips", "myBallons", "baloonsHere", "ChipsHere", "Spaces", "null",
         "if", "while", "repeat", "not", "facing?" "blocked?", "can-put?", "can", "not", "J", "Go", ":",
-        "(", ")", "defun"]
+        "(", ")", "defun", 'loop']
+
 posiciones = ["north", "south", "east", "west", "front", "back", "right", "left"]
 
 def parser(filetxt, instruccioens):
@@ -21,12 +22,12 @@ def parser(filetxt, instruccioens):
     if parentesis % 2 != 0 or tokens.count("(") != tokens.count(")"):
         verificador = False
         
-    variables = {
-        
-    }
-    funciones = {
-        
-    }
+    variables = {}
+    variables = anadir_variable(tokens, variables)
+    
+    funciones = {}
+    funciones = anadir_funcion(tokens, funciones)
+    
     i = 0  #iterador
     posicion = 0 #indice
     
@@ -36,12 +37,9 @@ def parser(filetxt, instruccioens):
     while posicion < len(tokens) and verificador == True:
         if i == 0:
             avance, verificador = comandos(tokens[posicion], tokens, instrucciones, posicion, variables, funciones)
-            print(tokens[posicion])
+
             posicion += avance
         
-
-
-    
     
     if verificador == True:
         respuesta = "Sirve :D"
@@ -56,15 +54,27 @@ def parser(filetxt, instruccioens):
 def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, variables: dict, funciones: dict):
     verificador = True
     avance = 1
+
     if token == "(":
-        if tokens[posicionAct + 1] == "defvar" and tokens[posicionAct + 2] in variables.keys() and \
-            tokens[posicionAct + 3] in variables.values() and tokens[posicionAct + 4] == ")":
-                print('hola')
+        if tokens[posicionAct + 1] == "defvar" and tokens[posicionAct + 2] in variables and \
+            tokens[posicionAct + 3] in variables and tokens[posicionAct + 4] == ")":
+            pass
     return avance, verificador
   
     
-    
-    
+def anadir_variable(tokens, variables):
+    for i in range(len(tokens)):
+        if tokens[i] == "defvar":
+            if tokens[i + 1] not in variables:
+                variables[tokens[i + 1]] = 0
+    return variables
+
+def anadir_funcion(tokens, funciones):
+    for i in range(len(tokens)):
+        if tokens[i] == "defun":
+            if tokens[i + 1] not in funciones:
+                funciones[tokens[i + 1]] = 0
+    return funciones
     
 prueba = """
 (defvar a  3)
