@@ -1,7 +1,7 @@
 verificador = True
 
 instrucciones = ['defvar', '=', 'move', 'skip', 'turn', 'move-dir', 'runs-dir', 'move-face', 
-        'Dim', 'myXpos', 'myYpose', 'myChips', 'myBallons', 'baloonsHere', 'ChipsHere', 'Spaces', 'null',
+        'dim', 'myxpos', 'myypose', 'mychips', 'myballoons', 'balloonshere', 'chipsHere', 'spaces', 'null',
         'if', 'while', 'repeat', 'not', 'facing?', 'blocked?', 'can-put?', 'can', 'not', 'J', 'Go', ':',
         '(', ')', 'defun', 'loop', 'can-move', 'can-pick', 'iszero?' ]
 
@@ -14,6 +14,8 @@ turn = [':right', ':left', ':around']
 condiciones = ['facing?', 'blocked?', 'can-put?', 'can-pick?', 'can-move?', 'iszero?', 'not']
 
 put_pick = [':chips', ':balloons']
+
+constantes = ['mychips', 'dim','myballoons', 'myxpos', 'myypos', 'balloonshere', 'chipsHere', 'spaces']
 
 
 
@@ -144,6 +146,32 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
                 if 'can-move' in nuevoBloque:
                     if nuevoBloque[nuevoBloque.index('can-move') + 1] not in posiciones:
                         verificador = False
+                if 'can-put' in nuevoBloque:
+                    if nuevoBloque[nuevoBloque.index('can-put') + 1] not in put_pick:
+                        verificador = False
+                    if nuevoBloque[nuevoBloque.index('can-put') + 2] not in variables.keys() and not nuevoBloque[nuevoBloque.index('can-put') + 2].isdigit():
+                        verificador = False
+                if 'can-pick' in nuevoBloque:
+                    if nuevoBloque[nuevoBloque.index('can-pick') + 1] not in put_pick:
+                        verificador = False
+                    if nuevoBloque[nuevoBloque.index('can-pick') + 2] not in variables.keys() and not nuevoBloque[nuevoBloque.index('can-pick') + 2].isdigit():
+                        verificador = False
+                        
+                if 'iszero?' in nuevoBloque:
+                    if nuevoBloque[nuevoBloque.index('iszero?') + 1] not in variables.keys() and not nuevoBloque[nuevoBloque.index('iszero?') + 1].isdigit()\
+                        and nuevoBloque[nuevoBloque.index('iszero?') + 1] not in constantes:
+                        print(nuevoBloque[nuevoBloque.index('iszero?') + 1])
+                        verificador = False
+                        
+                if 'put' in nuevoBloque:
+                    if nuevoBloque[nuevoBloque.index('put') + 1] not in put_pick:
+                        print('toy aca')
+                        verificador = False
+                    if nuevoBloque[nuevoBloque.index('put') + 2] not in variables.keys() and not nuevoBloque[nuevoBloque.index('put') + 2].isdigit():
+                        print('toy aca2')
+                        verificador = False
+                        
+                #put, pick, move-dir, run-dirs
                         
                 #Hace falta mopve-dir, iszero, can-put, can-pick, put, pickk, run-dirs esto pq no se usar el .digit()
                 
@@ -279,7 +307,7 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
                 j+=1
                 #Valida que haya algo dentro de la condicion
                 
-                
+
                 
 
                     
@@ -344,7 +372,7 @@ prueba = '''
 (defvar d 0)
 (= d 7)
 
-(if (facing? :north) (turn :right) (null))
+(if (facing? :north) (turn :right) (put :chips 1))
 
 (move a)
 
@@ -361,7 +389,7 @@ prueba = '''
 	(move-dir start :back)
 	(run-dirs :front :front :right :right)
 	(move-face c :east)
-	(if (blocked?) (if (isZero? b) (recursion a b c) (null)) (recursion c d start))
+	(if (blocked?) (if (isZero? mychips) (recursion a b c) (null)) (recursion c d start))
 )
 '''
 parser(prueba, instrucciones)
