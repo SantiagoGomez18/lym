@@ -5,9 +5,17 @@ instrucciones = ['defvar', '=', 'move', 'skip', 'turn', 'move-dir', 'runs-dir', 
         'if', 'while', 'repeat', 'not', 'facing?', 'blocked?', 'can-put?', 'can', 'not', 'J', 'Go', ':',
         '(', ')', 'defun', 'loop', 'can-move', 'can-pick', 'iszero?' ]
 
-posiciones = [':north', ':south', ':east', ':west', ':front', ':back', ':right', ':left']
+posiciones = [':north', ':south', ':east', ':west']
+
+dirs = [':front', ':back', ':left', ':right']
+
+turn = [':right', ':left', ':around']
 
 condiciones = ['facing?', 'blocked?', 'can-put?', 'can-pick?', 'can-move?', 'iszero?', 'not']
+
+put_pick = [':chips', ':balloons']
+
+
 
 def parser(filetxt, instrucciones):
     verificador = True
@@ -23,6 +31,7 @@ def parser(filetxt, instrucciones):
     parentesis = (tokens.count('(') + tokens.count(')'))
         
     if parentesis % 2 != 0 or tokens.count('(') != tokens.count(')'):
+        print('error parentesis')
         verificador = False
         
     variables = {}
@@ -48,7 +57,9 @@ def parser(filetxt, instrucciones):
             
     
     if contador_defvar != contador_defi:
+        print('error en defvar')
         verificador = False
+    print(contador_defvar, contador_defi)
 
     if verificador == True:
         respuesta = 'Sirve :D'
@@ -63,8 +74,6 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
     avance = 1
     contador_def = 0
     
-    
-    
     if token == '(':
         #Dervaf hechos
 
@@ -78,12 +87,15 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
                 if (nuevoBloque[1] == 'defvar' or nuevoBloque[1] == '='):
                     avance = nuevoBloque.index(')') + 1
                 contador_def += 1
+            print(nuevoBloque)
             for i in range(len(nuevoBloque)):
                 if i == 2 and not nuevoBloque[i].isalpha():
                     verificador = False
                 elif i == 3:
                     if nuevoBloque[i] not in variables.keys() and nuevoBloque[i] != 'myxpos' and \
-                        nuevoBloque[i] != 'myypos' and not nuevoBloque[i].isdigit():
+                        nuevoBloque[i] != 'myypos' and not nuevoBloque[i].isdigit() and nuevoBloque[i] != 'dim' and\
+                        nuevoBloque[i] != 'mychips' and nuevoBloque[i] != 'myballons' and nuevoBloque[i] != 'baloonshere' and\
+                        nuevoBloque[i] != 'chipshere' and nuevoBloque[i] != 'spaces':
                         verificador = False 
         
         #Bloque de condicionales, not y loops                
@@ -102,51 +114,92 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
                         contar_parentesis_der += 1
                     i+=1
                 nuevoBloque = tokens[posicionAct: posicionAct + i]
+                
+                print(nuevoBloque)
+                if 'skip' in nuevoBloque:
+                    if nuevoBloque[nuevoBloque.index('skip') + 1] not in variables.keys():
+                        verificador = False
+                if 'move' in nuevoBloque:
+                    if nuevoBloque[nuevoBloque.index('move') + 1] not in variables.keys():
+                        verificador = False
+                if 'turn' in nuevoBloque:
+                    if nuevoBloque[nuevoBloque.index('turn') + 1] not in turn:
+                        verificador = False
+                if 'move-face' in nuevoBloque:
+                    if nuevoBloque[nuevoBloque.index('move-face') + 1] not in variables.keys() or nuevoBloque[nuevoBloque.index('move-face') + 2] not in posiciones:
+                        verificador = False
+                if 'face' in nuevoBloque:
+                    if nuevoBloque[nuevoBloque.index('face') + 1] not in posiciones:
+                        verificador = False
+                if 'facing?' in nuevoBloque:
+                    if nuevoBloque[nuevoBloque.index('facing?') + 1] not in posiciones:
+                        verificador = False
+                if 'can-move' in nuevoBloque:
+                    if nuevoBloque[nuevoBloque.index('can-move') + 1] not in posiciones:
+                        verificador = False
+                        
+                #Hace falta mopve-dir, iszero, can-put, can-pick, put, pickk, run-dirs esto pq no se usar el .digit()
+                
                 j = 1
                 for i in range(len(nuevoBloque)):
                     if j < len(nuevoBloque):
                         if nuevoBloque[i]  == '(' and nuevoBloque[j] == ')':
                             verificador = False
-                    #Valida que haya algo dentro de la condicion
                     j+=1
+                    #Valida que haya algo dentro de la condicion
+                    
+                    
+                    
                     if nuevoBloque[i] not in instrucciones and nuevoBloque[i] not in posiciones\
-                        and nuevoBloque[i] not in variables.keys() and nuevoBloque[i] not in funciones.keys():
+                        and nuevoBloque[i] not in variables.keys() and nuevoBloque[i] not in funciones.keys()\
+                        and nuevoBloque[i] not in turn and nuevoBloque[i] not in condiciones and nuevoBloque[i] not in put_pick:
                         verificador = False
                     #Valida que dentro de la condicion halla un comando o una variable creada
+                    
+                    
+                    
                     if nuevoBloque[i]  == 'if':
                         if nuevoBloque[i + 2] == ['loop', 'repeat']:
                             verificador = False 
                     #Valida que no haya un loop o repeat dentro de un if
-                        if nuevoBloque[i + 2] in ['facing?', 'can-move', 'move-dir', 'move-face']:
+                    
+                        if nuevoBloque[i + 2] in ['facing?', 'can-move', 'move-face']:
                             if nuevoBloque[i + 3] not in posiciones:
                                 verificador = False
                     #Valida que si hay un comando de movimiento, haya una posicion
-                        if nuevoBloque[i + 2] in ['move', 'move-dir', 'move-face']:
+                    
+                        if nuevoBloque[i + 2] in ['move','skip']:
                             if nuevoBloque[i + 3] not in variables.keys():
                                 verificador = False
                     #Valida que si hay un comando de movimiento, haya una variable creada
+                    
+                        if nuevoBloque[i + 2] == 'turn':
+                            if nuevoBloque[i + 3] not in turn:
+                                verificador = False
+                    #Valida que si hay un comando de movimiento, haya una posicion
+                    
+                        if nuevoBloque[i + 2] == 'face':
+                            if nuevoBloque[i + 3] not in posiciones:
+                                verificador = False
+                    #Valida que si hay un comando de movimiento, haya una posicion
+                       
+                    #Hacen falta las que usan el .digit()
+                    
+                    
                     if nuevoBloque[i] == 'not':
                         if nuevoBloque[i + 2] not in condiciones:
                             verificador = False
-                        if nuevoBloque[i + 2] in ['facing?', 'can-move', 'move-dir', 'move-face']:
-                            if nuevoBloque[i + 3] not in posiciones:
-                                verificador = False
-                    
-                    
-
-                
-
-                
-
-
-
+                            
+                    if nuevoBloque[i] == 'loop':
+                        if nuevoBloque[i + 2] not in condiciones:
+                            verificador = False
                         
     return avance, verificador, contador_def
   
   
   
   
-  
+
   
   
   
