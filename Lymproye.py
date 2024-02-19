@@ -57,18 +57,16 @@ def parser(filetxt, instrucciones):
             posicion += avance
             contador_defi += contador
             
-    
     if contador_defvar != contador_defi:
         print('error en defvar 0')
         verificador = False
-    print(contador_defvar, contador_defi)
-    print(funciones.keys())
+
+
 
     if verificador == True:
         respuesta = 'Sirve :D'
     elif verificador == False:
         respuesta = 'No sirve :c' 
-
 
     return print(respuesta)
 
@@ -93,8 +91,7 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
                     avance = nuevoBloque.index(')') + 1
                     for i in range(len(nuevoBloque)):
                         if i == 2 and not nuevoBloque[i].isalpha() and nuevoBloque[i]:
-                            print(nuevoBloque[i])
-                            print(nuevoBloque)
+
                             print('error en defvar 1')
                             verificador = False
                         elif i == 3:
@@ -105,8 +102,7 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
                                 print('error en defvar 4')
                                 verificador = False 
                     contador_def += 1
-            
-        
+
         #Bloque de condicionales, not y loops                
         elif(tokens[posicionAct + 1] in ['if', 'loop', 'not']):
             if tokens[posicionAct + 2] != '(':
@@ -123,8 +119,16 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
                         contar_parentesis_der += 1
                     i+=1
                 nuevoBloque = tokens[posicionAct: posicionAct + i]
+                for i in range(len(nuevoBloque)):
+                    if nuevoBloque[i] == 'if': 
+
+                        parentesis_der = nuevoBloque.count(')')
+                        parentesis_izq = nuevoBloque.count('(')
+                        suma = parentesis_der + parentesis_izq
+
+                        if suma % 2 != 0 or suma < 6:
+                            verificador = False
                 
-        
                 if 'skip' in nuevoBloque:
                     if nuevoBloque[nuevoBloque.index('skip') + 1] not in variables.keys():
                         verificador = False
@@ -160,20 +164,8 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
                 if 'iszero?' in nuevoBloque:
                     if nuevoBloque[nuevoBloque.index('iszero?') + 1] not in variables.keys() and not nuevoBloque[nuevoBloque.index('iszero?') + 1].isdigit()\
                         and nuevoBloque[nuevoBloque.index('iszero?') + 1] not in constantes:
-                        print(nuevoBloque[nuevoBloque.index('iszero?') + 1])
+
                         verificador = False
-                        
-                if 'put' in nuevoBloque:
-                    if nuevoBloque[nuevoBloque.index('put') + 1] not in put_pick:
-                        print('toy aca')
-                        verificador = False
-                    if nuevoBloque[nuevoBloque.index('put') + 2] not in variables.keys() and not nuevoBloque[nuevoBloque.index('put') + 2].isdigit():
-                        print('toy aca2')
-                        verificador = False
-                        
-                #put, pick, move-dir, run-dirs
-                        
-                #Hace falta mopve-dir, iszero, can-put, can-pick, put, pickk, run-dirs esto pq no se usar el .digit()
                 
                 j = 1
                 for i in range(len(nuevoBloque)):
@@ -182,16 +174,12 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
                             verificador = False
                     j+=1
                     #Valida que haya algo dentro de la condicion
-                    
-                    
-                    
+
                     if nuevoBloque[i] not in instrucciones and nuevoBloque[i] not in posiciones\
                         and nuevoBloque[i] not in variables.keys() and nuevoBloque[i] not in funciones.keys()\
                         and nuevoBloque[i] not in turn and nuevoBloque[i] not in condiciones and nuevoBloque[i] not in put_pick:
                         verificador = False
                     #Valida que dentro de la condicion halla un comando o una variable creada
-                    
-                    
                     
                     if nuevoBloque[i]  == 'if':
                         if nuevoBloque[i + 2] == ['loop', 'repeat']:
@@ -229,7 +217,8 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
                         if nuevoBloque[i + 2] not in condiciones:
                             verificador = False
                             
-        #Bloques libres, no he creado los bloques pero estan las condiciones
+        #Bloques libres
+        
         elif (tokens[posicionAct + 1] in ['move', 'skip']):
             nuevoBloque = tokens[posicionAct : posicionAct + 4]           
             if nuevoBloque[3] != ')':
@@ -275,10 +264,17 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
                 verificador = False
             if nuevoBloque[2] not in variables.keys() and not nuevoBloque[2].isdigit() or nuevoBloque[3] not in posiciones:
                 verificador = False
-
-        #falta solo el run-dirs 
+                
+        elif tokens[posicionAct + 1] == 'run-dirs':
+            indice_cierre = tokens.index(')', posicionAct)
+            nuevoBloque = tokens[posicionAct: indice_cierre + 1]    
+            
+            for i in range(2, len(nuevoBloque)-1):
+                if nuevoBloque[i] not in dirs:
+                    verificador = False
         
-        #Bloque de funciones
+        #Bloque de funciones incopleto
+
         elif tokens[posicionAct + 1] in ['defun']:
             if tokens[posicionAct + 2] not in funciones.keys():
                 verificador = False
@@ -297,7 +293,6 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
                         contar_parentesis_der += 1
                     i+=1
                 nuevoBloque = tokens[posicionAct: posicionAct + i]
-                print(nuevoBloque)
 
             j = 1
             for i in range(len(nuevoBloque)):
@@ -306,25 +301,33 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
                         verificador = False
                 j+=1
                 #Valida que haya algo dentro de la condicion
-                
+            
+            #bloques de repeat
+        elif tokens[posicionAct + 1] == 'repeat':
+            if tokens[posicionAct + 3] == '(':
+                contar_parentesis_der = 0
+                contar_parentesis_izq = 2   
+                i = 4
+                while contar_parentesis_der != contar_parentesis_izq:
+                    if tokens[posicionAct + i] == '(':
+                        contar_parentesis_izq += 1
+                    elif tokens[posicionAct + i] == ')':
+                        contar_parentesis_der += 1
+                    i+=1
+                nuevoBloque = tokens[posicionAct: posicionAct + i]
+                parentesis_der = nuevoBloque.count(')')
+                parentesis_izq = nuevoBloque.count('(')
+                suma = parentesis_der + parentesis_izq
+                if suma % 2 != 0 or suma < 6:
+                    verificador = False
+                if nuevoBloque[2] not in variables.keys() and not nuevoBloque[2].isdigit():
+                    verificador = False
+                if nuevoBloque[3] != '(':
+                    verificador = False
 
-                
-
-                    
-                    
-                        
+          
     return avance, verificador, contador_def
-  
-  
-  
-  
 
-  
-  
-  
-  
-  
-  
     
 def anadir_variable(tokens, variables):
     for i in range(len(tokens)):
@@ -372,7 +375,7 @@ prueba = '''
 (defvar d 0)
 (= d 7)
 
-(if (facing? :north) (turn :right) (put :chips 1))
+(if (null) (turn :right) (null))
 
 (move a)
 
@@ -380,7 +383,7 @@ prueba = '''
 
 (repeat b (
 	(face :south)
-	(move c)
+	(move a)
 	(put :chips 1)
 ))
 
@@ -391,5 +394,6 @@ prueba = '''
 	(move-face c :east)
 	(if (blocked?) (if (isZero? mychips) (recursion a b c) (null)) (recursion c d start))
 )
+(run-dirs :front :front :right :right)
 '''
 parser(prueba, instrucciones)
