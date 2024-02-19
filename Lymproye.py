@@ -57,14 +57,16 @@ def parser(filetxt, instrucciones):
             
     
     if contador_defvar != contador_defi:
-        print('error en defvar')
+        print('error en defvar 0')
         verificador = False
     print(contador_defvar, contador_defi)
+    print(funciones.keys())
 
     if verificador == True:
         respuesta = 'Sirve :D'
     elif verificador == False:
         respuesta = 'No sirve :c' 
+
 
     return print(respuesta)
 
@@ -82,21 +84,26 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
             nuevoBloque = tokens[posicionAct: posicionAct + 5]
 
             if nuevoBloque[4] != ')':
+                print('error en defvar 6')
                 verificador = False
             else: 
                 if (nuevoBloque[1] == 'defvar' or nuevoBloque[1] == '='):
                     avance = nuevoBloque.index(')') + 1
-                contador_def += 1
-            print(nuevoBloque)
-            for i in range(len(nuevoBloque)):
-                if i == 2 and not nuevoBloque[i].isalpha():
-                    verificador = False
-                elif i == 3:
-                    if nuevoBloque[i] not in variables.keys() and nuevoBloque[i] != 'myxpos' and \
-                        nuevoBloque[i] != 'myypos' and not nuevoBloque[i].isdigit() and nuevoBloque[i] != 'dim' and\
-                        nuevoBloque[i] != 'mychips' and nuevoBloque[i] != 'myballons' and nuevoBloque[i] != 'baloonshere' and\
-                        nuevoBloque[i] != 'chipshere' and nuevoBloque[i] != 'spaces':
-                        verificador = False 
+                    for i in range(len(nuevoBloque)):
+                        if i == 2 and not nuevoBloque[i].isalpha() and nuevoBloque[i]:
+                            print(nuevoBloque[i])
+                            print(nuevoBloque)
+                            print('error en defvar 1')
+                            verificador = False
+                        elif i == 3:
+                            if nuevoBloque[i] not in variables.keys() and nuevoBloque[i] != 'myxpos' and \
+                                nuevoBloque[i] != 'myypos' and not nuevoBloque[i].isdigit() and nuevoBloque[i] != 'dim' and\
+                                nuevoBloque[i] != 'mychips' and nuevoBloque[i] != 'myballons' and nuevoBloque[i] != 'baloonshere' and\
+                                nuevoBloque[i] != 'chipshere' and nuevoBloque[i] != 'spaces':
+                                print('error en defvar 4')
+                                verificador = False 
+                    contador_def += 1
+            
         
         #Bloque de condicionales, not y loops                
         elif(tokens[posicionAct + 1] in ['if', 'loop', 'not']):
@@ -115,7 +122,7 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
                     i+=1
                 nuevoBloque = tokens[posicionAct: posicionAct + i]
                 
-                print(nuevoBloque)
+        
                 if 'skip' in nuevoBloque:
                     if nuevoBloque[nuevoBloque.index('skip') + 1] not in variables.keys():
                         verificador = False
@@ -193,19 +200,90 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
                     if nuevoBloque[i] == 'loop':
                         if nuevoBloque[i + 2] not in condiciones:
                             verificador = False
+                            
         #Bloques libres, no he creado los bloques pero estan las condiciones
         elif (tokens[posicionAct + 1] in ['move', 'skip']):
-            if tokens[posicionAct + 2] not in variables.keys():
+            nuevoBloque = tokens[posicionAct : posicionAct + 4]           
+            if nuevoBloque[3] != ')':
                 verificador = False
-            elif tokens[posicionAct + 1] == 'turn':
-                if tokens[posicionAct + 2] not in turn:
-                    verificador = False
-            elif tokens[posicionAct + 1] == 'face':
-                if tokens[posicionAct + 2] not in posiciones:
-                    verificador = False
-            elif tokens[posicionAct + 1] == 'move-face':
-                if tokens[posicionAct + 2] not in variables.keys() or tokens[posicionAct + 3] not in posiciones:
-                    verificador = False
+            if nuevoBloque[2] not in variables.keys():
+                verificador = False 
+                
+        elif (tokens[posicionAct + 1] in ['turn']):
+            nuevoBloque = tokens[posicionAct : posicionAct + 4]
+            if nuevoBloque[3] != ')':
+                verificador = False
+            if nuevoBloque[2] not in turn:
+                verificador = False
+                
+        elif (tokens[posicionAct + 1] in ['face']): 
+            nuevoBloque = tokens[posicionAct : posicionAct + 4]
+            if nuevoBloque[3] != ')':
+                verificador = False
+            if nuevoBloque[2] not in posiciones:
+                verificador = False
+                
+        elif tokens[posicionAct + 1] in ['move-dir']:
+            nuevoBloque = tokens[posicionAct: posicionAct + 5]
+            if nuevoBloque[4] != ')':
+                print('error en move-dir')
+                verificador = False
+            if (nuevoBloque[2] not in variables.keys() and not nuevoBloque[2].isdigit()) or nuevoBloque[3] not in dirs :
+                print('error en move-dir')
+                verificador = False
+                
+        elif tokens[posicionAct + 1] in ['put', 'picks']:
+            nuevoBloque = tokens[posicionAct: posicionAct + 5]
+            if nuevoBloque[4] != ')':
+                verificador = False
+            if nuevoBloque[2] not in put_pick:
+                verificador = False
+            if nuevoBloque[3] not in variables.keys() and not nuevoBloque[3].isdigit():
+                verificador = False
+                
+        elif tokens[posicionAct + 1] == 'move-face':
+            nuevoBloque = tokens[posicionAct: posicionAct + 5]
+            if nuevoBloque[4] != ')':
+                verificador = False
+            if nuevoBloque[2] not in variables.keys() and not nuevoBloque[2].isdigit() or nuevoBloque[3] not in posiciones:
+                verificador = False
+
+        #falta solo el run-dirs 
+        
+        #Bloque de funciones
+        elif tokens[posicionAct + 1] in ['defun']:
+            if tokens[posicionAct + 2] not in funciones.keys():
+                verificador = False
+
+            if tokens[posicionAct + 3] != '(':
+                verificador = False
+            
+            if tokens[posicionAct + 3] == '(':
+                contar_parentesis_der = 0
+                contar_parentesis_izq = 2
+                i = 4
+                while contar_parentesis_der != contar_parentesis_izq:
+                    if tokens[posicionAct + i] == '(':
+                        contar_parentesis_izq += 1
+                    elif tokens[posicionAct + i] == ')':
+                        contar_parentesis_der += 1
+                    i+=1
+                nuevoBloque = tokens[posicionAct: posicionAct + i]
+                print(nuevoBloque)
+
+            j = 1
+            for i in range(len(nuevoBloque)):
+                if j < len(nuevoBloque):
+                    if nuevoBloque[i]  == '(' and nuevoBloque[j] == ')':
+                        verificador = False
+                j+=1
+                #Valida que haya algo dentro de la condicion
+                
+                
+                
+
+                    
+                    
                         
     return avance, verificador, contador_def
   
@@ -259,7 +337,7 @@ def anadir_funcion(tokens, funciones):
     return funciones
     
 prueba = '''
-(defvar s 5)
+(defvar x 2)
 (defvar a 2)
 (defvar b a)
 (defvar c myXpos)
@@ -268,7 +346,7 @@ prueba = '''
 
 (if (facing? :north) (turn :right) (null))
 
-(turn )
+(move a)
 
 (loop (not (not (not (blocked?)))) (skip a))
 
@@ -278,7 +356,7 @@ prueba = '''
 	(put :chips 1)
 ))
 
-(defun recursion (p q r) 
+    (defun recursion (p q r) 
 	(defvar start myYpos)
 	(move-dir start :back)
 	(run-dirs :front :front :right :right)
