@@ -193,6 +193,19 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
                     if nuevoBloque[i] == 'loop':
                         if nuevoBloque[i + 2] not in condiciones:
                             verificador = False
+        #Bloques libres, no he creado los bloques pero estan las condiciones
+        elif (tokens[posicionAct + 1] in ['move', 'skip']):
+            if tokens[posicionAct + 2] not in variables.keys():
+                verificador = False
+            elif tokens[posicionAct + 1] == 'turn':
+                if tokens[posicionAct + 2] not in turn:
+                    verificador = False
+            elif tokens[posicionAct + 1] == 'face':
+                if tokens[posicionAct + 2] not in posiciones:
+                    verificador = False
+            elif tokens[posicionAct + 1] == 'move-face':
+                if tokens[posicionAct + 2] not in variables.keys() or tokens[posicionAct + 3] not in posiciones:
+                    verificador = False
                         
     return avance, verificador, contador_def
   
@@ -254,6 +267,8 @@ prueba = '''
 (= d 7)
 
 (if (facing? :north) (turn :right) (null))
+
+(turn )
 
 (loop (not (not (not (blocked?)))) (skip a))
 
