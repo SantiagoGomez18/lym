@@ -10,6 +10,7 @@ posiciones = ["north", "south", "east", "west", "front", "back", "right", "left"
 def parser(filetxt, instruccioens):
     verificador = True
     prueba = filetxt
+    contador_defi = 0
     prueba = prueba.replace("\n", " ").replace("\t", " ")
     
     if prueba[len(prueba)- 1] == " ":
@@ -24,7 +25,8 @@ def parser(filetxt, instruccioens):
         
     variables = {}
     variables = anadir_variable(tokens, variables)
-    
+    variables = actualizar_variable(tokens, variables)
+
     funciones = {}
     funciones = anadir_funcion(tokens, funciones)
     
@@ -34,33 +36,59 @@ def parser(filetxt, instruccioens):
      #Elimina el carascter vacio de la lista de tokens para poder realizar un mero estudio
     while "" in tokens:
         tokens.remove("")
+    contador_defvar = tokens.count("defvar")
     
     while posicion < len(tokens) and verificador == True:
         if i == 0:
-            avance, verificador = comandos(tokens[posicion], tokens, instrucciones, posicion, variables, funciones)
-
+            avance, verificador, contador = comandos(tokens[posicion], tokens, instrucciones, posicion, variables, funciones)
             posicion += avance
+            contador_defi += contador
             
+
+
+    
+    
+    if contador_defvar != contador_defi:
+        verificador = False
+    
     if verificador == True:
         respuesta = "Sirve :D"
     elif verificador == False:
-        respuesta = "No sirve :c"
-
+        respuesta = "No sirve :c" 
     return print(respuesta)
 
 
 def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, variables: dict, funciones: dict):
     verificador = True
     avance = 1
-
-
+    contador_def = 0
+    
+    
+    
     if token == "(":
-        if tokens[posicionAct + 1] == "defvar" and tokens[posicionAct + 2] in variables.keys() and \
-            tokens[posicionAct + 3] in variables and tokens[posicionAct + 4] == ")":
+        #Dervaf hechos
+        if tokens[posicionAct + 1] in ['defvar', '='] and tokens[posicionAct + 2] in variables.keys() and \
+            tokens[posicionAct + 3] in variables.values() or tokens[posicionAct + 3] in variables.keys() and tokens[posicionAct + 4] == ")":
             nuevoBloque = tokens[posicionAct: posicionAct + 5]
-            avance = nuevoBloque.index(")") + 1
+            if nuevoBloque[4] != ")":
+                verificador = False
+            else: 
+                avance = nuevoBloque.index(")") + 1
+            contador_def += 1
+            print(nuevoBloque)
+            for i in range(len(nuevoBloque)):
+                if i == 2 and not nuevoBloque[i].isalpha():
+                    verificador = False
+                elif i == 3:
+                    if nuevoBloque[i] not in variables.keys() and nuevoBloque[i] != 'myxpos' and \
+                        nuevoBloque[i] != 'myypos' and not nuevoBloque[i].isdigit():
+                        verificador = False 
+                    
             
-    return avance, verificador
+
+                
+                        
+    return avance, verificador, contador_def
   
   
   
@@ -86,10 +114,23 @@ def anadir_variable(tokens, variables):
                             variables[tokens[i + 1]] = tokens[i + 5]
                             if tokens[i + 5] == '':
                                 variables[tokens[i + 1]] = tokens[i + 6]    
-                                if tokens[i + 6] == '':
-                                    variables[tokens[i + 1]] = tokens[i + 7]
-
     return variables
+
+def actualizar_variable(tokens, variables):
+    for i in range(len(tokens)):
+        if tokens[i] == "=":
+            if tokens[i + 1] in variables:
+                variables[tokens[i + 1]] = tokens[i + 2]
+                if tokens[i + 2] == '':
+                    variables[tokens[i + 1]] = tokens[i + 3]
+                    if tokens[i + 3] == '':
+                        variables[tokens[i + 1]] = tokens[i + 4]
+                        if tokens[i + 4] == '':
+                            variables[tokens[i + 1]] = tokens[i + 5]
+                            if tokens[i + 5] == '':
+                                variables[tokens[i + 1]] = tokens[i + 6]
+    return variables
+
 
 def anadir_funcion(tokens, funciones):
     for i in range(len(tokens)):
@@ -100,7 +141,7 @@ def anadir_funcion(tokens, funciones):
     
 prueba = """
 
-(defvar a  3)
+(defvar a 5)
 (defvar b a)
 (defvar c myXpos)
 (defvar d 0)
