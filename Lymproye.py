@@ -1,3 +1,6 @@
+# Santiago Gomwz y Santiago Quevedo
+#Las pruebas estan al final del archivo, no vimos que era lectura de txt :( pero si sirve :D
+
 verificador = True
 
 instrucciones = ['defvar', '=', 'move', 'skip', 'turn', 'move-dir', 'runs-dir', 'move-face', 
@@ -16,9 +19,7 @@ condiciones = ['facing?', 'blocked?', 'can-put?', 'can-pick?', 'can-move?', 'isz
 put_pick = [':chips', ':balloons']
 
 constantes = ['mychips', 'dim','myballoons', 'myxpos', 'myypos', 'balloonshere', 'chipsHere', 'spaces']
-
-
-
+ 
 def parser(filetxt, instrucciones):
     verificador = True
     prueba = filetxt
@@ -430,6 +431,8 @@ def anadir_funcion(tokens, funciones):
     return funciones
     
     
+    
+#prueba bien sictacticamente
 prueba = '''
 
 (defvar a  3)
@@ -458,7 +461,7 @@ prueba = '''
 '''
 
 
-
+#Prueba bien sintacticamente
 prueba2 =  '''(defvar rotate 3)
 
 (if (can-move? :north) (move-dir 1 :front) (null))
@@ -491,4 +494,32 @@ prueba2 =  '''(defvar rotate 3)
 )
 
 (run-dirs :left :front :left :down :right)'''
-parser(prueba, instrucciones)
+
+
+#Prueba mal sintacticamente
+prueba3 = '''
+(defvar a 3)
+(defvar b a)
+(defvar c myXpos)
+(= d 7)
+
+(if (facing? :north) (turn :right) (null))
+
+(loop (not (not (blocked?)))) (skip a))
+
+(repeat b (
+    (face :south)
+    (move c)
+    (put :chips 1)
+))
+
+(defun recursion (x y z) 
+    (defvar start myYpos)
+    (move-dir start :back)
+    (run-dirs :front :front :right :right)
+    (move-face z :east)
+    (if (blocked?) (if (isZero? y) (recursion z y x) (null)) (recursion x d start))
+)
+'''
+
+parser(prueba3, instrucciones)
