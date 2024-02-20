@@ -59,9 +59,6 @@ def parser(filetxt, instrucciones):
     if contador_defvar != contador_defi:
         print('error en contador de dervaf')
         verificador = False
-    print(contador_defvar, contador_defi)
-
-    print(variables.keys(), variables.values())
 
     if verificador == True:
         respuesta = 'Sirve :D'
@@ -82,7 +79,6 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
         if tokens[posicionAct + 1] in ['defvar', '='] and tokens[posicionAct + 2] in variables.keys() and \
             tokens[posicionAct + 3] in variables.values() or (tokens[posicionAct + 3] in variables.keys() and tokens[posicionAct + 4] == ')'):
             nuevoBloque = tokens[posicionAct: posicionAct + 5]
-            print(nuevoBloque)
 
             if nuevoBloque[4] != ')':
                 print('error en dervaf mas elementos de los esperados')
@@ -138,7 +134,6 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
                         verificador = False
                 if 'move' in nuevoBloque:
                     if nuevoBloque[nuevoBloque.index('move') + 1] not in variables.keys() and (not nuevoBloque[nuevoBloque.index('move') + 1].isdigit()):
-                        print(nuevoBloque[nuevoBloque.index('move') + 1])
                         print('error en move dentro if')
                         verificador = False
                 if 'turn' in nuevoBloque:
@@ -195,7 +190,7 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
                         and nuevoBloque[i] not in variables.keys() and nuevoBloque[i] not in funciones.keys()\
                         and nuevoBloque[i] not in turn and nuevoBloque[i] not in condiciones and nuevoBloque[i] not in put_pick\
                         and nuevoBloque[i] not in dirs and nuevoBloque[i] not in variables.values() and nuevoBloque not in funciones.values():
-                        print(nuevoBloque[i])
+
                         print('dentro if variable o comando no creado')
                         verificador = False
                     #Valida que dentro de la condicion halla un comando o una variable creada
@@ -266,7 +261,6 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
                         contar_parentesis_der += 1
                     i+=1
                 nuevoBloque = tokens[posicionAct: posicionAct + i]
-                
                 #Valida que haya algo dentro de la condicion
             if nuevoBloque[3] == '(':
                 bloque2 = nuevoBloque[3: nuevoBloque.index(')')]
@@ -278,7 +272,6 @@ def comandos(token: str, tokens: list, instrucciones: list, posicionAct: int, va
             indice_cierre = tokens.index(')', posicionAct)
             nuevoBloque = tokens[posicionAct + 2: indice_cierre]
             variables = actualizar_None(nuevoBloque, variables)
-            print(variables)
         
         elif (tokens[posicionAct + 1] in ['move', 'skip']):
             nuevoBloque = tokens[posicionAct : posicionAct + 4]           
@@ -436,35 +429,32 @@ def anadir_funcion(tokens, funciones):
                 funciones[tokens[i + 1]] = 0
     return funciones
     
+    
 prueba = '''
-(defvar x 2)
-(defvar a 2)
+
+(defvar a  3)
 (defvar b a)
 (defvar c myXpos)
 (defvar d 0)
 (= d 7)
 
-(if (null) (turn :right) (null))
-
-(move a)
+(if (facing? :north) (turn :right) (null))
 
 (loop (not (not (not (blocked?)))) (skip a))
 
 (repeat b (
 	(face :south)
-	(move a)
+	(move c)
 	(put :chips 1)
 ))
 
-    (defun recursion (p q r) 
+(defun recursion (x y z) 
 	(defvar start myYpos)
 	(move-dir start :back)
 	(run-dirs :front :front :right :right)
-	(move-face p :east)
-	(if (blocked?) (if (isZero? mychips) (recursion p q r) (null)) (recursion q p start))
+	(move-face z :east)
+	(if (blocked?) (if (isZero? y) (recursion z y x) (null)) (recursion x d start))
 )
-    (recursion 1 2 3)
-(run-dirs :front :front :right :right)
 '''
 
 
@@ -501,4 +491,4 @@ prueba2 =  '''(defvar rotate 3)
 )
 
 (run-dirs :left :front :left :down :right)'''
-parser(prueba2, instrucciones)
+parser(prueba, instrucciones)
