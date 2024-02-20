@@ -522,4 +522,4 @@ prueba3 = '''
 )
 '''
 
-parser(prueba3, instrucciones)
+parser(prueba, instrucciones)
